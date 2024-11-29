@@ -3746,6 +3746,7 @@ body.is-menu-visible #menu {
 /* Container for the rating stars */
 .rating {
   display: flex; /* Arrange stars in a row */
+  flex-direction: row-reverse;
   justify-content: center; /* Center the stars horizontally */
   gap: 5px; /* Add spacing between stars */
 }
@@ -3773,4 +3774,12 @@ body.is-menu-visible #menu {
 .star:hover,
 .star:hover ~ .star {
   color: #f0c330; /* Highlight color for stars */
+}
+
+.rating[data-selected='1'] .star:nth-child(-n + 1),
+.rating[data-selected='2'] .star:nth-child(-n + 2),
+.rating[data-selected='3'] .star:nth-child(-n + 3),
+.rating[data-selected='4'] .star:nth-child(-n + 4),
+.rating[data-selected='5'] .star:nth-child(-n + 5) {
+  color: #f0c330;
 }
