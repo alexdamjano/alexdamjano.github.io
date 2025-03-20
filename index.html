@@ -42,6 +42,7 @@
       }
       .hints-box {
         width: 100%;
+        height: 30%;
         background-color: white;
         justify-content: space-between;
         align-items: center;
@@ -55,10 +56,14 @@
         color: white;
         display: flex;
         justify-content: space-between;
-        align-items: center;
+        align-items: top;
         padding: 10px 20px;
         box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
         margin-top: 20px;
+      }
+      .answer-text {
+        font-size: 12px;
+        color: red;
       }
       .button {
         background-color: #007bff;
@@ -107,7 +112,11 @@
     </div>
     <div class="crossword" id="crossword"></div>
     <div class="hints-bar">
-      <div class="hints-box"><div class="hint-text" id="hint"></div></div>
+      <div class="hints-box">
+        <div class="hint-text" id="hint"></div>
+        <button class="button" onclick="check()">Check Answers</button>
+        <div class="answer-text" id="answer">No Guess To Check Yet</div>
+      </div>
     </div>
 
     <script>
@@ -116,16 +125,46 @@
       let ongoing = false;
       let secondsElapsed = 0;
 
+      const size = 5;
+
       const hints = [
-        ['row 0', 'row 1', 'row 2', 'row 3', 'row 4'],
-        ['col 0', 'col 1', 'col 2', 'col 3', 'col 4'],
+        [
+          '',
+          `The man, the myth, the legend`,
+          '',
+          `Jonny loves when we get down here`,
+          '',
+        ],
+        [
+          `Animal in need of contraception`,
+          '',
+          `Ally ___, 'Goddess of Wisdom'`,
+          '',
+          `It's not HIStory it's ___story!`,
+        ],
+      ];
+
+      const contents = [
+        [null, null, null, null, null],
+        [null, null, null, null, null],
+        [null, null, null, null, null],
+        [null, null, null, null, null],
+        [null, null, null, null, null],
+      ];
+
+      const answers = [
+        ['h', null, 't', null, null],
+        ['o', 'd', 'i', 'e', null],
+        ['r', null, 'n', null, 'h'],
+        ['s', 't', 'a', 'g', 'e'],
+        ['e', null, null, null, 'r'],
       ];
 
       function createCrossword(size, blankSquares) {
         const crossword = document.getElementById('crossword');
         crossword.style.gridTemplateColumns = `repeat(${size}, 60px)`;
         crossword.style.gridTemplateRows = `repeat(${size}, 60px)`;
-        crossword.innerHTML = ''; // Clear existing grid
+        crossword.innerHTML = null; // Clear existing grid
 
         for (let i = 0; i < size * size; i++) {
           const cell = document.createElement('input');
@@ -139,9 +178,12 @@
             cell.classList.add('blank');
             cell.disabled = true;
           } else {
-            cell.addEventListener('click', () =>
-              toggleHighlight(size, cell, blankSquares)
-            );
+            cell.addEventListener('click', () => {
+              toggleHighlight(size, cell, blankSquares);
+            });
+            cell.addEventListener('input', (e) => {
+              contents[cell.dataset.row][cell.dataset.col] = e.data;
+            });
           }
 
           crossword.appendChild(cell);
@@ -168,7 +210,6 @@
       function highlightRow(size, row, col, blankSquares) {
         let startCol = col;
         let endCol = col;
-        console.log('row: ' + row);
         displayRowHint(row);
 
         while (
@@ -192,14 +233,12 @@
       }
 
       function displayRowHint(row) {
-        console.log(hints[0][row]);
         document.getElementById('hint').textContent = `${hints[0][row]}`;
       }
 
       function highlightColumn(size, col, row, blankSquares) {
         let startRow = row;
         let endRow = row;
-        console.log('col: ' + col);
         displayColHint(col);
 
         while (
@@ -223,8 +262,19 @@
       }
 
       function displayColHint(col) {
-        console.log(hints[1][col]);
         document.getElementById('hint').textContent = `${hints[1][col]}`;
+      }
+
+      function check() {
+        for (row in contents) {
+          for (col in contents[row]) {
+            if (contents[row][col] != answers[row][col]) {
+              document.getElementById('answer').textContent = `INCORRECT BOOOO`;
+              return;
+            }
+          }
+        }
+        document.getElementById('answer').textContent = `CORRECT GOOD JOB YAY`;
       }
 
       function timer() {
@@ -244,7 +294,7 @@
         }, 1000);
       }
 
-      createCrossword(5, [0, 5, 19, 24]); // Example blank squares
+      createCrossword(5, [1, 3, 4, 9, 11, 13, 21, 22, 23]); // Example blank squares
     </script>
   </body>
 </html>
