@@ -36,6 +36,18 @@
       .timer {
         font-size: 16px;
       }
+      .hint-text {
+        font-size: 16px;
+        color: black;
+      }
+      .hints-box {
+        width: 100%;
+        background-color: white;
+        justify-content: space-between;
+        align-items: center;
+        padding: 10px 20px;
+        margin: 20px 20px;
+      }
       .hints-bar {
         width: 100%;
         height: 100%;
@@ -68,8 +80,8 @@
         margin-bottom: 20px;
       }
       .cell {
-        width: 40px;
-        height: 40px;
+        width: 60px;
+        height: 60px;
         text-align: center;
         font-size: 24px;
         text-transform: uppercase;
@@ -94,7 +106,9 @@
       </div>
     </div>
     <div class="crossword" id="crossword"></div>
-    <div class="hints-bar"></div>
+    <div class="hints-bar">
+      <div class="hints-box"><div class="hint-text" id="hint"></div></div>
+    </div>
 
     <script>
       let lastSelectedCell = null;
@@ -102,10 +116,15 @@
       let ongoing = false;
       let secondsElapsed = 0;
 
+      const hints = [
+        ['row 0', 'row 1', 'row 2', 'row 3', 'row 4'],
+        ['col 0', 'col 1', 'col 2', 'col 3', 'col 4'],
+      ];
+
       function createCrossword(size, blankSquares) {
         const crossword = document.getElementById('crossword');
-        crossword.style.gridTemplateColumns = `repeat(${size}, 40px)`;
-        crossword.style.gridTemplateRows = `repeat(${size}, 40px)`;
+        crossword.style.gridTemplateColumns = `repeat(${size}, 60px)`;
+        crossword.style.gridTemplateRows = `repeat(${size}, 60px)`;
         crossword.innerHTML = ''; // Clear existing grid
 
         for (let i = 0; i < size * size; i++) {
@@ -149,6 +168,8 @@
       function highlightRow(size, row, col, blankSquares) {
         let startCol = col;
         let endCol = col;
+        console.log('row: ' + row);
+        displayRowHint(row);
 
         while (
           startCol > 0 &&
@@ -170,9 +191,16 @@
         }
       }
 
+      function displayRowHint(row) {
+        console.log(hints[0][row]);
+        document.getElementById('hint').textContent = `${hints[0][row]}`;
+      }
+
       function highlightColumn(size, col, row, blankSquares) {
         let startRow = row;
         let endRow = row;
+        console.log('col: ' + col);
+        displayColHint(col);
 
         while (
           startRow > 0 &&
@@ -192,6 +220,11 @@
             .querySelector(`.cell[data-row='${r}'][data-col='${col}']`)
             .classList.add('highlight');
         }
+      }
+
+      function displayColHint(col) {
+        console.log(hints[1][col]);
+        document.getElementById('hint').textContent = `${hints[1][col]}`;
       }
 
       function timer() {
