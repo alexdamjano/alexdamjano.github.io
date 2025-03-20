@@ -15,8 +15,6 @@
       }
       .crossword {
         display: grid;
-        grid-template-columns: repeat(2, 40px);
-        grid-template-rows: repeat(2, 40px);
         gap: 2px;
         background-color: black;
         padding: 5px;
@@ -27,15 +25,117 @@
         text-align: center;
         font-size: 24px;
         text-transform: uppercase;
+        border: 1px solid #000;
+        background-color: white;
+      }
+      .highlight {
+        background-color: lightblue;
+      }
+      .blank {
+        background-color: black;
+        border: none;
       }
     </style>
   </head>
   <body>
-    <div class="crossword">
-      <input type="text" class="cell" maxlength="1" />
-      <input type="text" class="cell" maxlength="1" />
-      <input type="text" class="cell" maxlength="1" />
-      <input type="text" class="cell" maxlength="1" />
-    </div>
+    <div class="crossword" id="crossword"></div>
+
+    <script>
+      let lastSelectedCell = null;
+
+      function createCrossword(size, blankSquares) {
+        const crossword = document.getElementById('crossword');
+        crossword.style.gridTemplateColumns = `repeat(${size}, 40px)`;
+        crossword.style.gridTemplateRows = `repeat(${size}, 40px)`;
+        crossword.innerHTML = ''; // Clear existing grid
+
+        for (let i = 0; i < size * size; i++) {
+          const cell = document.createElement('input');
+          cell.type = 'text';
+          cell.className = 'cell';
+          cell.maxLength = 1;
+          cell.dataset.row = Math.floor(i / size);
+          cell.dataset.col = i % size;
+
+          if (blankSquares.includes(i)) {
+            cell.classList.add('blank');
+            cell.disabled = true;
+          } else {
+            cell.addEventListener('click', () =>
+              toggleHighlight(size, cell, blankSquares)
+            );
+          }
+
+          crossword.appendChild(cell);
+        }
+      }
+
+      function toggleHighlight(size, cell, blankSquares) {
+        const row = parseInt(cell.dataset.row);
+        const col = parseInt(cell.dataset.col);
+
+        document.querySelectorAll('.cell').forEach((cell) => {
+          cell.classList.remove('highlight');
+        });
+
+        if (lastSelectedCell === cell) {
+          highlightColumn(size, col, row, blankSquares);
+          lastSelectedCell = null;
+        } else {
+          highlightRow(size, row, col, blankSquares);
+          lastSelectedCell = cell;
+        }
+      }
+
+      function highlightRow(size, row, col, blankSquares) {
+        let startCol = col;
+        let endCol = col;
+
+        while (
+          startCol > 0 &&
+          !blankSquares.includes(row * size + (startCol - 1))
+        ) {
+          startCol--;
+        }
+        while (
+          endCol < size - 1 &&
+          !blankSquares.includes(row * size + (endCol + 1))
+        ) {
+          endCol++;
+        }
+
+        for (let c = startCol; c <= endCol; c++) {
+          document
+            .querySelector(`.cell[data-row='${row}'][data-col='${c}']`)
+            .classList.add('highlight');
+        }
+      }
+
+      function highlightColumn(size, col, row, blankSquares) {
+        let startRow = row;
+        let endRow = row;
+
+        while (
+          startRow > 0 &&
+          !blankSquares.includes((startRow - 1) * size + col)
+        ) {
+          startRow--;
+        }
+        while (
+          endRow < size - 1 &&
+          !blankSquares.includes((endRow + 1) * size + col)
+        ) {
+          endRow++;
+        }
+
+        for (let r = startRow; r <= endRow; r++) {
+          document
+            .querySelector(`.cell[data-row='${r}'][data-col='${col}']`)
+            .classList.add('highlight');
+        }
+      }
+
+      createCrossword(5, [2, 7, 12, 17, 22]); // Example blank squares
+    </script>
   </body>
 </html>
